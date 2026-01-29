@@ -1,7 +1,7 @@
 using BackendCGR.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ControleGastosResidenciais.Data
+namespace BackendCGR.Data
 {
     public class ApplicationDbContext : DbContext
     {
