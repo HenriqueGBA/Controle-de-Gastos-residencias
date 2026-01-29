@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BackendCGR")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+526eda7f5d66a8c8c91318cd06517278ceaba0e5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3c25b4c16b789a150da9e590197c995e55037e72")]
 [assembly: System.Reflection.AssemblyProductAttribute("BackendCGR")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BackendCGR")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
