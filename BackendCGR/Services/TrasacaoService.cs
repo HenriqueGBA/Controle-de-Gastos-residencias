@@ -4,7 +4,7 @@ using BackendCGR.Models;
 using BackendCGR.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace ControleGastosResidenciais.Services
+namespace BackendCGR.Services
 {
     public class TransacaoService : ITransacaoService
     {
