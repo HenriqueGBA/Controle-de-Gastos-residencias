@@ -14,20 +14,53 @@ namespace BackendCGR.Controllers
         public TransacaoController(ITransacaoService service) => _service = service;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transacao>>> Listar()
-            => await _service.ListarTransacoesAsync();
+        public async Task<ActionResult<IEnumerable<object>>> Listar()
+        {
+            var transacoes = await _service.ListarTransacoesApiAsync();
+            return Ok(transacoes);
+        }
 
         [HttpPost]
-        public async Task<ActionResult<Transacao>> Cadastrar(TransacaoDto dto)
+        public async Task<ActionResult<object>> Cadastrar(TransacaoDto dto)
         {
             try
             {
                 var transacao = await _service.CriarTransacaoAsync(dto);
-                return CreatedAtAction(nameof(Listar), new { id = transacao.Id }, transacao);
+                var retorno = await _service.BuscarTransacaoDtoAsync(transacao.Id);
+
+                return CreatedAtAction(nameof(Listar), new { id = transacao.Id }, retorno);
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Editar(int id, [FromBody] TransacaoDto dto)
+        {
+            try
+            {
+                await _service.EditarTransacaoAsync(id, dto);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Deletar(int id)
+        {
+            try
+            {
+                await _service.DeletarTransacaoAsync(id);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }

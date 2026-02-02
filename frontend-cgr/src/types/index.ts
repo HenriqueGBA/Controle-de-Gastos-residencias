@@ -7,14 +7,14 @@ export interface Pessoa {
 export interface Categoria {
   id: number;
   descricao: string;
-  finalidade: "Despesa" | "Receita" | "Ambas";
+  finalidade: number;
 }
 
 export interface Transacao {
   id: number;
   descricao: string;
   valor: number;
-  tipo: "Despesa" | "Receita";
+  tipo: number | "Despesa" | "Receita";
   categoriaId: number;
   pessoaId: number;
   pessoa?: Pessoa;
