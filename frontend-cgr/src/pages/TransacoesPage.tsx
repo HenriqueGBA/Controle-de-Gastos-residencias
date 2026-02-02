@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../api/api";
-import { Transacao, Categoria } from "../types";
+import { Transacao, Categoria, Pessoa } from "../types";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { ArrowUpCircle, ArrowDownCircle, FileSpreadsheet } from "lucide-react";
-import { Pessoa } from "../types";
+import { Table, ColumnDef } from "../components/Table";
 
 function TransacoesPage() {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
@@ -22,34 +22,28 @@ function TransacoesPage() {
   const tipoColors = ["text-red-700", "text-green-700"] as const;
   const tipoIcons = [ArrowDownCircle, ArrowUpCircle] as const;
 
-
   const tipoMap = {
     "Despesa": 0,
     "Receita": 1
-  }
+  };
 
-  useEffect(() => {
-    buscarTransacoes();
-    buscarCategorias();
-  }, []);
-
-  async function buscarPessoas() {
-  const res = await api.get("/pessoa");
-  setPessoas(res.data);
-  }
   useEffect(() => {
     buscarTransacoes();
     buscarCategorias();
     buscarPessoas();
+    // eslint-disable-next-line
   }, []);
 
+  async function buscarPessoas() {
+    const res = await api.get("/pessoa");
+    setPessoas(res.data);
+  }
   async function buscarTransacoes() {
     setLoading(true);
     const res = await api.get("/transacao");
     setTransacoes(res.data);
     setLoading(false);
   }
-
   async function buscarCategorias() {
     const res = await api.get("/categoria");
     setCategorias(res.data);
@@ -57,7 +51,7 @@ function TransacoesPage() {
 
   async function adicionar(e: React.FormEvent) {
     e.preventDefault();
-    if (!descricao || !valor || !categoriaId) return;
+    if (!descricao || !valor || !categoriaId || !pessoaId) return;
     await api.post("/transacao", {
       descricao,
       valor: Number(valor),
@@ -69,8 +63,42 @@ function TransacoesPage() {
     setValor("");
     setCategoriaId("");
     setTipo("Despesa");
+    setPessoaId("");
     buscarTransacoes();
   }
+
+  // ---- definição das colunas para Table ----
+  const columns: ColumnDef<Transacao>[] = [
+    { header: "Descrição", render: t => t.descricao },
+    {
+      header: "Valor",
+      render: t => (
+        <span className={`font-semibold ${tipoColors[t.tipo as number]}`}>
+          {Number(t.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+        </span>
+      )
+    },
+    {
+      header: "Categoria",
+      render: t => categorias.find(cat => cat.id === t.categoriaId)?.descricao || "-",
+    },
+    {
+      header: "Tipo",
+      render: t => (
+        <span className={`flex items-center gap-1 ${tipoColors[t.tipo as number]}`}>
+          {React.createElement(
+            tipoIcons[t.tipo as number],
+            { className: `w-4 h-4 ${t.tipo === 0 ? "text-red-600" : "text-green-600"}` }
+          )}
+          {tipoLabels[t.tipo as number]}
+        </span>
+      )
+    },
+    {
+      header: "Pessoa",
+      render: t => pessoas.find(p => p.id === t.pessoaId)?.nome || "-",
+    }
+  ];
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
@@ -166,43 +194,13 @@ function TransacoesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-12 text-center text-gray-400">Carregando...</div>
-          ) : transacoes.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">Nenhuma transação encontrada.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-gray-100">
-                    <th className="p-2 text-left font-semibold text-gray-700">Descrição</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Valor</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Categoria</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Tipo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transacoes.map(t => (
-                    <tr key={t.id} className="border-b last:border-none hover:bg-gray-50">
-                      <td className="p-2">{t.descricao}</td>
-                      <td className={`p-2 font-semibold ${tipoColors[t.tipo as number]}`}>
-                        {Number(t.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                      </td>
-                      <td className="p-2">
-                        {categorias.find(cat => cat.id === t.categoriaId)?.descricao || "-"}
-                      </td>
-                      <td className={`p-2 flex items-center gap-1`}>
-                        {React.createElement(tipoIcons[t.tipo as number], { className: `w-4 h-4 ${t.tipo === 0 ? "text-red-600" : "text-green-600"}` })}
-                        <span className={tipoColors[t.tipo as number]}>
-                          {tipoLabels[t.tipo as number]}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table
+            columns={columns}
+            data={transacoes}
+            loading={loading}
+            tableName="Transações"
+            showSearch
+          />
         </CardContent>
       </Card>
     </div>

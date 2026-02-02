@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { UserPlus, Users } from "lucide-react";
+import { Table, ColumnDef } from "../components/Table";
 
 function PessoasPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
@@ -62,6 +63,59 @@ function PessoasPage() {
     }
   }
 
+  // --- colunas para Table ---
+  const columns: ColumnDef<Pessoa>[] = [
+    {
+      header: "Nome",
+      render: p =>
+        editando === p.id
+          ? (
+            <Input value={nomeEdicao} onChange={e => setNomeEdicao(e.target.value)} maxLength={200} />
+          )
+          : p.nome
+    },
+    {
+      header: "Idade",
+      render: p =>
+        editando === p.id
+          ? (
+            <Input
+              value={idadeEdicao}
+              type="number"
+              min={0}
+              onChange={e => {
+                const val = e.target.value.replace(/\D/, "");
+                setIdadeEdicao(val === "" ? "" : Number(val));
+              }}
+            />
+          )
+          : p.idade
+    },
+    {
+      header: "Ações",
+      render: p =>
+        editando === p.id ? (
+          <div className="flex gap-2">
+            <Button variant="primary" onClick={() => salvarEdicao(p.id)} type="button">
+              Salvar
+            </Button>
+            <Button variant="primary" onClick={cancelarEdicao} type="button">
+              Cancelar
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="primary" onClick={() => iniciarEdicao(p)} type="button">
+              Editar
+            </Button>
+            <Button variant="primary" onClick={() => excluirPessoa(p.id)} type="button">
+              Excluir
+            </Button>
+          </div>
+        )
+    }
+  ];
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
       <Card className="mb-8 w-full">
@@ -112,72 +166,13 @@ function PessoasPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-12 text-center text-gray-400">Carregando...</div>
-          ) : pessoas.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">Nenhuma pessoa cadastrada.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-gray-100">
-                    <th className="p-2 text-left font-semibold text-gray-700">Nome</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Idade</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pessoas.map(p => (
-                    <tr key={p.id} className="border-b last:border-none hover:bg-gray-50">
-                      <td className="p-2">
-                        {editando === p.id ? (
-                          <Input value={nomeEdicao} onChange={e => setNomeEdicao(e.target.value)} maxLength={200} />
-                        ) : (
-                          p.nome
-                        )}
-                      </td>
-                      <td className="p-2">
-                        {editando === p.id ? (
-                          <Input
-                            value={idadeEdicao}
-                            type="number"
-                            min={0}
-                            onChange={e => {
-                              const val = e.target.value.replace(/\D/, "");
-                              setIdadeEdicao(val === "" ? "" : Number(val));
-                            }}
-                          />
-                        ) : (
-                          p.idade
-                        )}
-                      </td>
-                      <td className="p-2 flex gap-2">
-                        {editando === p.id ? (
-                          <>
-                            <Button variant="primary" onClick={() => salvarEdicao(p.id)} type="button">
-                              Salvar
-                            </Button>
-                            <Button variant="primary" onClick={cancelarEdicao} type="button">
-                              Cancelar
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button variant="primary" onClick={() => iniciarEdicao(p)} type="button">
-                              Editar
-                            </Button>
-                            <Button variant="primary" onClick={() => excluirPessoa(p.id)} type="button">
-                              Excluir
-                            </Button>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table
+            columns={columns}
+            data={pessoas}
+            loading={loading}
+            tableName="Pessoas"
+            showSearch
+          />
         </CardContent>
       </Card>
     </div>
