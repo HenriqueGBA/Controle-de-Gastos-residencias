@@ -12,6 +12,11 @@ function CategoriasPage() {
   const [finalidade, setFinalidade] = useState<Categoria["finalidade"]>("Despesa");
   const [loading, setLoading] = useState(true);
 
+  const finalidadeMap = {
+    "Despesa" : 0,
+    "Receita" : 1,
+    "Ambas"  : 2
+  }
   useEffect(() => {
     buscarCategorias();
     // eslint-disable-next-line
@@ -26,7 +31,10 @@ function CategoriasPage() {
 
   async function adicionar(e: React.FormEvent) {
     e.preventDefault();
-    await api.post("/categoria", { descricao, finalidade });
+    await api.post("/categoria", {
+      descricao,
+      finalidade: finalidadeMap[finalidade]
+    });
     setDescricao("");
     setFinalidade("Despesa");
     buscarCategorias();
