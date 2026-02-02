@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { api } from "../api/api";
 import { Pessoa } from "../types";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
@@ -22,18 +23,30 @@ function PessoasPage() {
 
   async function buscarPessoas() {
     setLoading(true);
-    const res = await api.get("/pessoa");
-    setPessoas(res.data);
+    try {
+      const res = await api.get("/pessoa");
+      setPessoas(res.data);
+    } catch {
+      toast.error("Erro ao buscar pessoas");
+    }
     setLoading(false);
   }
 
   async function adicionarPessoa(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome || idade === "") return;
-    await api.post("/pessoa", { nome, idade: Number(idade) });
-    setNome("");
-    setIdade("");
-    buscarPessoas();
+    if (!nome || idade === "") {
+      toast.error("Preencha nome e idade!");
+      return;
+    }
+    try {
+      await api.post("/pessoa", { nome, idade: Number(idade) });
+      toast.success("Pessoa adicionada!");
+      setNome("");
+      setIdade("");
+      buscarPessoas();
+    } catch (e: any) {
+      toast.error(e?.response?.data || "Erro ao cadastrar pessoa");
+    }
   }
 
   function iniciarEdicao(pessoa: Pessoa) {
@@ -43,11 +56,16 @@ function PessoasPage() {
   }
 
   async function salvarEdicao(id: number) {
-    await api.put(`/pessoa/${id}`, { nome: nomeEdicao, idade: Number(idadeEdicao) });
-    setEditando(null);
-    setNomeEdicao("");
-    setIdadeEdicao("");
-    buscarPessoas();
+    try {
+      await api.put(`/pessoa/${id}`, { nome: nomeEdicao, idade: Number(idadeEdicao) });
+      toast.success("Pessoa editada!");
+      setEditando(null);
+      setNomeEdicao("");
+      setIdadeEdicao("");
+      buscarPessoas();
+    } catch (e: any) {
+      toast.error(e?.response?.data || "Erro ao editar pessoa");
+    }
   }
 
   function cancelarEdicao() {
@@ -58,12 +76,16 @@ function PessoasPage() {
 
   async function excluirPessoa(id: number) {
     if (window.confirm("Tem certeza que deseja excluir esta pessoa? As transações associadas também serão removidas.")) {
-      await api.delete(`/pessoa/${id}`);
-      buscarPessoas();
+      try {
+        await api.delete(`/pessoa/${id}`);
+        toast.success("Pessoa excluída!");
+        buscarPessoas();
+      } catch (e: any) {
+        toast.error(e?.response?.data || "Erro ao excluir pessoa");
+      }
     }
   }
 
-  // --- colunas para Table ---
   const columns: ColumnDef<Pessoa>[] = [
     {
       header: "Nome",
