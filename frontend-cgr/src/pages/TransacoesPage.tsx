@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { ArrowUpCircle, ArrowDownCircle, FileSpreadsheet } from "lucide-react";
+import { Pessoa } from "../types";
 
 function TransacoesPage() {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
@@ -14,10 +15,28 @@ function TransacoesPage() {
   const [tipo, setTipo] = useState<"Despesa" | "Receita">("Despesa");
   const [loading, setLoading] = useState(true);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [pessoas, setPessoas] = useState<Pessoa[]>([]);
+  const [pessoaId, setPessoaId] = useState<number | "">("");
+
+
+  const tipoMap = {
+    "Despesa": 0,
+    "Receita": 1
+  }
 
   useEffect(() => {
     buscarTransacoes();
     buscarCategorias();
+  }, []);
+
+  async function buscarPessoas() {
+  const res = await api.get("/pessoa");
+  setPessoas(res.data);
+  }
+  useEffect(() => {
+    buscarTransacoes();
+    buscarCategorias();
+    buscarPessoas();
   }, []);
 
   async function buscarTransacoes() {
@@ -35,7 +54,13 @@ function TransacoesPage() {
   async function adicionar(e: React.FormEvent) {
     e.preventDefault();
     if (!descricao || !valor || !categoriaId) return;
-    await api.post("/transacao", { descricao, valor: Number(valor), tipo, categoriaId: Number(categoriaId) });
+    await api.post("/transacao", {
+      descricao,
+      valor: Number(valor),
+      tipo: tipoMap[tipo],
+      categoriaId: Number(categoriaId),
+      pessoaId: Number(pessoaId)
+    });
     setDescricao("");
     setValor("");
     setCategoriaId("");
@@ -103,6 +128,22 @@ function TransacoesPage() {
               >
                 <option value="Despesa">Despesa</option>
                 <option value="Receita">Receita</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-600">Pessoa</label>
+              <select
+                required
+                value={pessoaId}
+                onChange={e => setPessoaId(Number(e.target.value))}
+                className="border rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400 outline-none bg-white"
+              >
+                <option value="">Selecione</option>
+                {pessoas.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.nome}
+                  </option>
+                ))}
               </select>
             </div>
             <Button type="submit" variant="primary" className="mt-1 w-full md:w-auto">

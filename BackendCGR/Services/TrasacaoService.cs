@@ -51,11 +51,21 @@ namespace BackendCGR.Services
             return transacao;
         }
 
-        public async Task<List<Transacao>> ListarTransacoesAsync()
+        public async Task<IEnumerable<object>> ListarTransacoesApiAsync()
         {
             return await _context.Transacoes
-                .Include(t => t.Pessoa)
                 .Include(t => t.Categoria)
+                .Include(t => t.Pessoa)
+                .Select(t => new {
+                    id = t.Id,
+                    descricao = t.Descricao,
+                    valor = t.Valor,
+                    tipo = t.Tipo,
+                    categoriaId = t.CategoriaId,
+                    pessoaId = t.PessoaId,
+                    categoriaDescricao = t.Categoria != null ? t.Categoria.Descricao : "",
+                    pessoaNome = t.Pessoa != null ? t.Pessoa.Nome : ""
+                })
                 .ToListAsync();
         }
     }
