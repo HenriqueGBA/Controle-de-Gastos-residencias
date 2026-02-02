@@ -52,7 +52,6 @@ namespace BackendCGR.Controllers
             var pessoa = await _context.Pessoas.Include(p => p.Transacoes).FirstOrDefaultAsync(p => p.Id == id);
             if (pessoa is null) return NotFound();
 
-            // Remove todas as transações da pessoa
             _context.Transacoes.RemoveRange(pessoa.Transacoes ?? []);
             _context.Pessoas.Remove(pessoa);
             await _context.SaveChangesAsync();

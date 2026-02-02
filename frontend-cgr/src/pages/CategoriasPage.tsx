@@ -6,7 +6,6 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Tag } from "lucide-react";
 
-// Mapeamento seguro de número para label
 const finalidadeLabels = ["Despesa", "Receita", "Ambas"] as const;
 
 function CategoriasPage() {
@@ -15,12 +14,10 @@ function CategoriasPage() {
   const [finalidade, setFinalidade] = useState<"Despesa" | "Receita" | "Ambas">("Despesa");
   const [loading, setLoading] = useState(true);
 
-  // Edição
   const [editando, setEditando] = useState<number | null>(null);
   const [descricaoEdicao, setDescricaoEdicao] = useState("");
   const [finalidadeEdicao, setFinalidadeEdicao] = useState<"Despesa" | "Receita" | "Ambas">("Despesa");
 
-  // Maps para converter entre string no input/select e number do backend
   const finalidadeMap = {
     "Despesa": 0,
     "Receita": 1,
@@ -53,7 +50,6 @@ function CategoriasPage() {
   function iniciarEdicao(categoria: Categoria) {
     setEditando(categoria.id);
     setDescricaoEdicao(categoria.descricao);
-    // Converte o número vindo do backend para string para o select
     setFinalidadeEdicao(finalidadeStringFromNumber(Number(categoria.finalidade)) as "Despesa" | "Receita" | "Ambas");
   }
 
