@@ -5,12 +5,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { UserPlus, Users } from "lucide-react";
+import { Table, ColumnDef } from "../components/Table";
 
 function PessoasPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [nome, setNome] = useState("");
   const [idade, setIdade] = useState<number | "">("");
   const [loading, setLoading] = useState(true);
+  const [editando, setEditando] = useState<number | null>(null);
+  const [nomeEdicao, setNomeEdicao] = useState("");
+  const [idadeEdicao, setIdadeEdicao] = useState<number | "">("");
 
   useEffect(() => {
     buscarPessoas();
@@ -31,6 +35,86 @@ function PessoasPage() {
     setIdade("");
     buscarPessoas();
   }
+
+  function iniciarEdicao(pessoa: Pessoa) {
+    setEditando(pessoa.id);
+    setNomeEdicao(pessoa.nome);
+    setIdadeEdicao(pessoa.idade);
+  }
+
+  async function salvarEdicao(id: number) {
+    await api.put(`/pessoa/${id}`, { nome: nomeEdicao, idade: Number(idadeEdicao) });
+    setEditando(null);
+    setNomeEdicao("");
+    setIdadeEdicao("");
+    buscarPessoas();
+  }
+
+  function cancelarEdicao() {
+    setEditando(null);
+    setNomeEdicao("");
+    setIdadeEdicao("");
+  }
+
+  async function excluirPessoa(id: number) {
+    if (window.confirm("Tem certeza que deseja excluir esta pessoa? As transações associadas também serão removidas.")) {
+      await api.delete(`/pessoa/${id}`);
+      buscarPessoas();
+    }
+  }
+
+  // --- colunas para Table ---
+  const columns: ColumnDef<Pessoa>[] = [
+    {
+      header: "Nome",
+      render: p =>
+        editando === p.id
+          ? (
+            <Input value={nomeEdicao} onChange={e => setNomeEdicao(e.target.value)} maxLength={200} />
+          )
+          : p.nome
+    },
+    {
+      header: "Idade",
+      render: p =>
+        editando === p.id
+          ? (
+            <Input
+              value={idadeEdicao}
+              type="number"
+              min={0}
+              onChange={e => {
+                const val = e.target.value.replace(/\D/, "");
+                setIdadeEdicao(val === "" ? "" : Number(val));
+              }}
+            />
+          )
+          : p.idade
+    },
+    {
+      header: "Ações",
+      render: p =>
+        editando === p.id ? (
+          <div className="flex gap-2">
+            <Button variant="primary" onClick={() => salvarEdicao(p.id)} type="button">
+              Salvar
+            </Button>
+            <Button variant="primary" onClick={cancelarEdicao} type="button">
+              Cancelar
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="primary" onClick={() => iniciarEdicao(p)} type="button">
+              Editar
+            </Button>
+            <Button variant="primary" onClick={() => excluirPessoa(p.id)} type="button">
+              Excluir
+            </Button>
+          </div>
+        )
+    }
+  ];
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen w-full">
@@ -82,30 +166,13 @@ function PessoasPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="py-12 text-center text-gray-400">Carregando...</div>
-          ) : pessoas.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">Nenhuma pessoa cadastrada.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-gray-100">
-                    <th className="p-2 text-left font-semibold text-gray-700">Nome</th>
-                    <th className="p-2 text-left font-semibold text-gray-700">Idade</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pessoas.map(p => (
-                    <tr key={p.id} className="border-b last:border-none hover:bg-gray-50">
-                      <td className="p-2">{p.nome}</td>
-                      <td className="p-2">{p.idade}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <Table
+            columns={columns}
+            data={pessoas}
+            loading={loading}
+            tableName="Pessoas"
+            showSearch
+          />
         </CardContent>
       </Card>
     </div>
