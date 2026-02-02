@@ -26,7 +26,6 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filtra transações por pessoa, se selecionada
   const transacoesFiltradas = pessoaFiltro
     ? transacoes.filter((t) => t.pessoaId === pessoaFiltro)
     : transacoes;
@@ -45,7 +44,6 @@ export default function DashboardPage() {
     .reduce((acc, t) => acc + t.valor, 0);
   const saldo = totalReceitas - totalDespesas;
 
-  // Definição das colunas da Table
   const columns: ColumnDef<Transacao>[] = [
     {
       header: "Descrição",
@@ -110,7 +108,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="bg-green-50">
           <CardHeader>
