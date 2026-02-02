@@ -6,6 +6,6 @@ namespace BackendCGR.Services
     public interface ITransacaoService
     {
         Task<Transacao> CriarTransacaoAsync(TransacaoDto dto);
-        Task<List<Transacao>> ListarTransacoesAsync();
+        Task<IEnumerable<object>> ListarTransacoesApiAsync();
     }
 }

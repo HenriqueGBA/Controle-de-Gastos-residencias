@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle, DollarSign } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/Card";
 import { Input } from "../components/Input";
-// Adapte para importar sua API e tipos reais!
 import { api } from "../api/api"; 
 import { Transacao } from "../types";
 
@@ -77,7 +76,6 @@ export default function DashboardPage() {
         </Card>
       </div>
       
-      {/* Exemplo: lista de transações simples */}
       <Card>
         <CardHeader>
           <CardTitle>Transações Recentes</CardTitle>

@@ -14,8 +14,11 @@ namespace BackendCGR.Controllers
         public TransacaoController(ITransacaoService service) => _service = service;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transacao>>> Listar()
-            => await _service.ListarTransacoesAsync();
+            public async Task<ActionResult<IEnumerable<object>>> Listar()
+            {
+                var transacoes = await _service.ListarTransacoesApiAsync();
+                return Ok(transacoes);
+            }
 
         [HttpPost]
         public async Task<ActionResult<Transacao>> Cadastrar(TransacaoDto dto)
