@@ -7,5 +7,6 @@ namespace BackendCGR.Services
     {
         Task<Transacao> CriarTransacaoAsync(TransacaoDto dto);
         Task<IEnumerable<object>> ListarTransacoesApiAsync();
+        Task<object?> BuscarTransacaoDtoAsync(int id);
     }
 }

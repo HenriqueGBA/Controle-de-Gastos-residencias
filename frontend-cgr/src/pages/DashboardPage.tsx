@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const tipoLabels = ["Despesa", "Receita"] as const;
 
   useEffect(() => {
     setLoading(true);
@@ -17,8 +18,8 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalReceitas = transacoes.filter(t => t.tipo === "Receita").reduce((acc, t) => acc + t.valor, 0);
-  const totalDespesas = transacoes.filter(t => t.tipo === "Despesa").reduce((acc, t) => acc + t.valor, 0);
+  const totalDespesas = transacoes.filter(t => t.tipo === 0).reduce((acc, t) => acc + t.valor, 0);
+  const totalReceitas = transacoes.filter(t => t.tipo === 1).reduce((acc, t) => acc + t.valor, 0);
   const saldo = totalReceitas - totalDespesas;
 
   return (
@@ -101,7 +102,9 @@ export default function DashboardPage() {
                     .slice(0, 10).map(t => (
                     <tr key={t.id} className="border-b last:border-none">
                       <td className="p-2">{t.descricao}</td>
-                      <td className={`p-2 font-semibold ${t.tipo === "Receita" ? "text-green-700" : "text-red-700"}`}>{t.tipo}</td>
+                        <td className={`p-2 font-semibold ${t.tipo === 0 ? "text-red-700" : "text-green-700"}`}>
+                          {tipoLabels[t.tipo as number]}
+                        </td>
                       <td className="p-2">{t.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
                     </tr>
                   ))}

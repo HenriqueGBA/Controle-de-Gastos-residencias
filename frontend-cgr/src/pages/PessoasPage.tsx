@@ -11,6 +11,9 @@ function PessoasPage() {
   const [nome, setNome] = useState("");
   const [idade, setIdade] = useState<number | "">("");
   const [loading, setLoading] = useState(true);
+  const [editando, setEditando] = useState<number | null>(null);
+  const [nomeEdicao, setNomeEdicao] = useState("");
+  const [idadeEdicao, setIdadeEdicao] = useState<number | "">("");
 
   useEffect(() => {
     buscarPessoas();
@@ -30,6 +33,33 @@ function PessoasPage() {
     setNome("");
     setIdade("");
     buscarPessoas();
+  }
+
+  function iniciarEdicao(pessoa: Pessoa) {
+    setEditando(pessoa.id);
+    setNomeEdicao(pessoa.nome);
+    setIdadeEdicao(pessoa.idade);
+  }
+
+  async function salvarEdicao(id: number) {
+    await api.put(`/pessoa/${id}`, { nome: nomeEdicao, idade: Number(idadeEdicao) });
+    setEditando(null);
+    setNomeEdicao("");
+    setIdadeEdicao("");
+    buscarPessoas();
+  }
+
+  function cancelarEdicao() {
+    setEditando(null);
+    setNomeEdicao("");
+    setIdadeEdicao("");
+  }
+
+  async function excluirPessoa(id: number) {
+    if (window.confirm("Tem certeza que deseja excluir esta pessoa? As transações associadas também serão removidas.")) {
+      await api.delete(`/pessoa/${id}`);
+      buscarPessoas();
+    }
   }
 
   return (
@@ -93,13 +123,55 @@ function PessoasPage() {
                   <tr className="border-b bg-gray-100">
                     <th className="p-2 text-left font-semibold text-gray-700">Nome</th>
                     <th className="p-2 text-left font-semibold text-gray-700">Idade</th>
+                    <th className="p-2 text-left font-semibold text-gray-700">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pessoas.map(p => (
                     <tr key={p.id} className="border-b last:border-none hover:bg-gray-50">
-                      <td className="p-2">{p.nome}</td>
-                      <td className="p-2">{p.idade}</td>
+                      <td className="p-2">
+                        {editando === p.id ? (
+                          <Input value={nomeEdicao} onChange={e => setNomeEdicao(e.target.value)} maxLength={200} />
+                        ) : (
+                          p.nome
+                        )}
+                      </td>
+                      <td className="p-2">
+                        {editando === p.id ? (
+                          <Input
+                            value={idadeEdicao}
+                            type="number"
+                            min={0}
+                            onChange={e => {
+                              const val = e.target.value.replace(/\D/, "");
+                              setIdadeEdicao(val === "" ? "" : Number(val));
+                            }}
+                          />
+                        ) : (
+                          p.idade
+                        )}
+                      </td>
+                      <td className="p-2 flex gap-2">
+                        {editando === p.id ? (
+                          <>
+                            <Button variant="primary" onClick={() => salvarEdicao(p.id)} type="button">
+                              Salvar
+                            </Button>
+                            <Button variant="primary" onClick={cancelarEdicao} type="button">
+                              Cancelar
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button variant="primary" onClick={() => iniciarEdicao(p)} type="button">
+                              Editar
+                            </Button>
+                            <Button variant="primary" onClick={() => excluirPessoa(p.id)} type="button">
+                              Excluir
+                            </Button>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

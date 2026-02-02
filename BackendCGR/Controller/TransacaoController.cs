@@ -14,19 +14,21 @@ namespace BackendCGR.Controllers
         public TransacaoController(ITransacaoService service) => _service = service;
 
         [HttpGet]
-            public async Task<ActionResult<IEnumerable<object>>> Listar()
-            {
-                var transacoes = await _service.ListarTransacoesApiAsync();
-                return Ok(transacoes);
-            }
+        public async Task<ActionResult<IEnumerable<object>>> Listar()
+        {
+            var transacoes = await _service.ListarTransacoesApiAsync();
+            return Ok(transacoes);
+        }
 
         [HttpPost]
-        public async Task<ActionResult<Transacao>> Cadastrar(TransacaoDto dto)
+        public async Task<ActionResult<object>> Cadastrar(TransacaoDto dto)
         {
             try
             {
                 var transacao = await _service.CriarTransacaoAsync(dto);
-                return CreatedAtAction(nameof(Listar), new { id = transacao.Id }, transacao);
+                var retorno = await _service.BuscarTransacaoDtoAsync(transacao.Id);
+
+                return CreatedAtAction(nameof(Listar), new { id = transacao.Id }, retorno);
             }
             catch (ArgumentException ex)
             {

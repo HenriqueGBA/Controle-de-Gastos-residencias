@@ -18,6 +18,10 @@ function TransacoesPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [pessoaId, setPessoaId] = useState<number | "">("");
 
+  const tipoLabels = ["Despesa", "Receita"] as const;
+  const tipoColors = ["text-red-700", "text-green-700"] as const;
+  const tipoIcons = [ArrowDownCircle, ArrowUpCircle] as const;
+
 
   const tipoMap = {
     "Despesa": 0,
@@ -181,19 +185,17 @@ function TransacoesPage() {
                   {transacoes.map(t => (
                     <tr key={t.id} className="border-b last:border-none hover:bg-gray-50">
                       <td className="p-2">{t.descricao}</td>
-                      <td className={`p-2 font-semibold ${t.tipo === "Receita" ? "text-green-700" : "text-red-700"}`}>
+                      <td className={`p-2 font-semibold ${tipoColors[t.tipo as number]}`}>
                         {Number(t.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                       </td>
                       <td className="p-2">
                         {categorias.find(cat => cat.id === t.categoriaId)?.descricao || "-"}
                       </td>
                       <td className={`p-2 flex items-center gap-1`}>
-                        {t.tipo === "Receita" ? (
-                          <ArrowUpCircle className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <ArrowDownCircle className="w-4 h-4 text-red-600" />
-                        )}
-                        <span className={t.tipo === "Receita" ? "text-green-700" : "text-red-700"}>{t.tipo}</span>
+                        {React.createElement(tipoIcons[t.tipo as number], { className: `w-4 h-4 ${t.tipo === 0 ? "text-red-600" : "text-green-600"}` })}
+                        <span className={tipoColors[t.tipo as number]}>
+                          {tipoLabels[t.tipo as number]}
+                        </span>
                       </td>
                     </tr>
                   ))}

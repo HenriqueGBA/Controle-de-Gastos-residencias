@@ -56,7 +56,8 @@ namespace BackendCGR.Services
             return await _context.Transacoes
                 .Include(t => t.Categoria)
                 .Include(t => t.Pessoa)
-                .Select(t => new {
+                .Select(t => new
+                {
                     id = t.Id,
                     descricao = t.Descricao,
                     valor = t.Valor,
@@ -67,6 +68,25 @@ namespace BackendCGR.Services
                     pessoaNome = t.Pessoa != null ? t.Pessoa.Nome : ""
                 })
                 .ToListAsync();
+        }
+
+        public async Task<object?> BuscarTransacaoDtoAsync(int id)
+        {
+            return await _context.Transacoes
+                .Include(t => t.Categoria)
+                .Include(t => t.Pessoa)
+                .Where(t => t.Id == id)
+                .Select(t => new {
+                    id = t.Id,
+                    descricao = t.Descricao,
+                    valor = t.Valor,
+                    tipo = t.Tipo,
+                    categoriaId = t.CategoriaId,
+                    pessoaId = t.PessoaId,
+                    categoriaDescricao = t.Categoria != null ? t.Categoria.Descricao : "",
+                    pessoaNome = t.Pessoa != null ? t.Pessoa.Nome : ""
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }
