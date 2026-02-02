@@ -4,6 +4,7 @@ import CategoriasPage from "./pages/CategoriasPage";
 import TransacoesPage from "./pages/TransacoesPage";
 import DashboardPage from "./pages/DashboardPage";
 import Navbar from "./components/Navbar";
+import { Toaster } from "sonner";
 
 const tabs = [
   { label: "Dashboard", value: "dashboard", to: "/dashboard" },
@@ -15,14 +16,15 @@ const tabs = [
 function App() {
   return (
     <Router>
+      <Toaster richColors position="top-right" />
       <Navbar tabs={tabs} title="Menu" />
-        <Routes>
-          <Route path="/pessoas" element={<PessoasPage />} />
-          <Route path="/categorias" element={<CategoriasPage />} />
-          <Route path="/transacoes" element={<TransacoesPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/" element={<DashboardPage />} />
-        </Routes>
+      <Routes>
+        <Route path="/pessoas" element={<PessoasPage />} />
+        <Route path="/categorias" element={<CategoriasPage />} />
+        <Route path="/transacoes" element={<TransacoesPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/" element={<DashboardPage />} />
+      </Routes>
     </Router>
   );
 }
