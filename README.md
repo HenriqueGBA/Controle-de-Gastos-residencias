@@ -20,7 +20,7 @@ Um sistema web para controle de gastos, receitas e fluxo financeiro de pessoas e
 - **axios**: Comunicação com API
 - **lucide-react**: Ícones SVG
 - **sonner**: Toasts de notificação
-- **(opcional) tailwindcss ou outro CSS framework**: Para estilização
+- **tailwindcss**: Para estilização
 
 Instale as principais dependências frontend com:
 
